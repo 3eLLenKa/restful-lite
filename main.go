@@ -2,9 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -181,5 +185,17 @@ func main() {
 		}
 	})
 
-	http.ListenAndServe(":8080", nil)
+	go func() {
+		http.ListenAndServe(":8080", nil)
+	}()
+
+	fmt.Println("Application running")
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	<-stop
+
+	fmt.Println("Application stopped")
+
 }
